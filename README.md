@@ -2,6 +2,8 @@
 
 A project to provide an acceptable Config Screen Library with a small footprint.
 
+![](https://i.imgur.com/kfJOtwt.png)
+
 ---
 
 ## How Small is Cloth Config Lite?
