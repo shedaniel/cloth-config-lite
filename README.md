@@ -19,8 +19,8 @@ repositories {
 }
 
 dependencies {
-    modApi "me.shedaniel.cloth:cloth-config-lite:1.0.+"
-    include "me.shedaniel.cloth:cloth-config-lite:1.0.+"
+    modApi "me.shedaniel.cloth:cloth-config-lite-fabric:1.0.+"
+    include "me.shedaniel.cloth:cloth-config-lite-fabric:1.0.+"
 }
 ```
 
