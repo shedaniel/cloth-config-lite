@@ -102,8 +102,8 @@ build.dependsOn sourcesJar
 publishing {
     publications {
         MyPublication(MavenPublication) {
-            artifact(proguardJarOut) {
-                builtBy proguardJar
+            artifact(remapJar) {
+                builtBy remapJar
             }
             artifact(sourcesJar) {
                 builtBy remapSourcesJar
