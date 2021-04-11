@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id": "cloth-config-lite-testmod",
+  "version": "${version}",
+  "entrypoints": {
+    "modmenu": [
+      "me.shedaniel.clothconfiglite.test.TestModMenu"
+    ]
+  }
+}

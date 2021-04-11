@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 1,
+  "id": "cloth-config-lite",
+  "version": "${version}",
+  "license": "MIT"
+}

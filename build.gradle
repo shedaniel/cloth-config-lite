@@ -1,0 +1,127 @@
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+import proguard.gradle.ProGuardTask
+
+buildscript {
+    repositories {
+        mavenLocal()
+        google()
+    }
+
+    dependencies {
+        classpath 'com.guardsquare:proguard-gradle:7.0.1'
+    }
+}
+
+plugins {
+    id 'java'
+    id 'forgified-fabric-loom' version "0.6-SNAPSHOT"
+    id 'maven-publish'
+}
+
+sourceCompatibility = targetCompatibility = 1.8
+
+group = "me.shedaniel.cloth"
+archivesBaseName = "cloth-config-lite"
+
+def runNumber = System.getenv("GITHUB_RUN_NUMBER") ?: "9999"
+version = project.mod_version + "." + runNumber
+
+repositories {
+    maven { url "https://maven.shedaniel.me/" }
+    maven { url "https://maven.terraformersmc.com/releases/" }
+}
+
+sourceSets {
+    testmod {
+        compileClasspath += main.compileClasspath + main.output
+        runtimeClasspath += main.runtimeClasspath + main.output
+    }
+}
+
+loom {
+    silentMojangMappingsLicense()
+}
+
+processResources {
+    filesMatching('fabric.mod.json') {
+        expand 'version': project.version
+    }
+    inputs.property "version", project.version
+
+    doLast {
+        fileTree(dir: outputs.files.asPath, include: "**/*.json").each {
+            File file -> file.text = JsonOutput.toJson(new JsonSlurper().parse(file))
+        }
+    }
+}
+
+dependencies {
+    minecraft("com.mojang:minecraft:${project.minecraft_version}")
+    mappings(loom.officialMojangMappings())
+
+    modApi("net.fabricmc:fabric-loader:${project.loader_version}")
+    modApi("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
+
+    modCompileOnly("com.terraformersmc:modmenu:${modmenu_version}") {
+        transitive(false)
+    }
+    modRuntime("com.terraformersmc:modmenu:${modmenu_version}") {
+        transitive(false)
+    }
+}
+
+tasks.jar {
+    archiveClassifier.set "dev"
+}
+
+def proguardJarOut = file(jar.archiveFile.get().getAsFile().absolutePath.replace(".jar", "-min.jar"))
+
+task proguardJar(type: ProGuardTask, dependsOn: jar) {
+    configuration './proguard.conf'
+    verbose
+    injars jar.archiveFile.get().getAsFile()
+    outjars proguardJarOut
+    libraryjars files(configurations.compileClasspath)
+    printmapping 'out.map'
+}
+
+tasks.remapJar {
+    input.set proguardJarOut
+    archiveClassifier.set null
+    dependsOn proguardJar
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+build.dependsOn sourcesJar
+
+publishing {
+    publications {
+        MyPublication(MavenPublication) {
+            artifact(proguardJarOut) {
+                builtBy proguardJar
+            }
+            artifact(sourcesJar) {
+                builtBy remapSourcesJar
+            }
+            groupId 'me.shedaniel.cloth'
+            artifactId 'cloth-config-lite-fabric'
+        }
+    }
+
+    repositories {
+        if (System.getenv("MAVEN_PASS") != null) {
+            maven {
+                url = "https://deploy.shedaniel.me/"
+                credentials {
+                    username = "shedaniel"
+                    password = System.getenv("MAVEN_PASS")
+                }
+            }
+        }
+    }
+}
