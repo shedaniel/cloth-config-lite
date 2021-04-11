@@ -32,10 +32,10 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class ConfigScreenImpl extends Screen implements ConfigScreen {
-    private static final int top = 26;
-    private static final int bottom = 24;
-    public static final float BOTTOM_C = .5f;
-    public static final float TOP_C = .67f;
+    private static final int TOP = 26;
+    private static final int BOTTOM = 24;
+    public static final float SCROLLBAR_BOTTOM_COLOR = .5f;
+    public static final float SCROLLBAR_TOP_COLOR = .67f;
     private final Screen parent;
     private final List<Option<?>> options = new ArrayList<>();
     public double scrollerAmount;
@@ -113,8 +113,8 @@ public class ConfigScreenImpl extends Screen implements ConfigScreen {
     
     @Override
     public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
-        overlayBackground(matrices, top, height - bottom, 32);
-        int y = (int) (top + 4 - Math.round(scrollerAmount));
+        overlayBackground(matrices, TOP, height - BOTTOM, 32);
+        int y = (int) (TOP + 4 - Math.round(scrollerAmount));
         for (Option<?> option : options) {
             int height1 = option.height();
             option.render(minecraft, font, 40, y, width - 80, height1, matrices, mouseX, mouseY, delta);
@@ -125,8 +125,8 @@ public class ConfigScreenImpl extends Screen implements ConfigScreen {
         
         matrices.pushPose();
         matrices.translate(0, 0, 500.0);
-        overlayBackground(matrices, 0, top, 64);
-        overlayBackground(matrices, height - bottom, height, 64);
+        overlayBackground(matrices, 0, TOP, 64);
+        overlayBackground(matrices, height - BOTTOM, height, 64);
         renderShadow(matrices);
         drawCenteredString(matrices, font, getTitle(), width / 2, 9, 0xFFFFFF);
         super.render(matrices, mouseX, mouseY, delta);
@@ -134,19 +134,19 @@ public class ConfigScreenImpl extends Screen implements ConfigScreen {
     }
     
     private void renderScrollBar() {
-        int listHeight = height - bottom - top;
+        int listHeight = height - BOTTOM - TOP;
         int totalHeight = totalHeight();
         if (totalHeight > listHeight) {
             int maxScroll = Math.max(0, totalHeight - listHeight);
             int height = listHeight * listHeight / totalHeight;
             height = Mth.clamp(height, 32, listHeight);
             height = Math.max(10, height);
-            int minY = Math.min(Math.max((int) scrollerAmount * (listHeight - height) / maxScroll + top, top), this.height - bottom - height);
+            int minY = Math.min(Math.max((int) scrollerAmount * (listHeight - height) / maxScroll + TOP, TOP), this.height - BOTTOM - height);
             
             int scrollbarPositionMaxX = width;
             int scrollbarPositionMinX = scrollbarPositionMaxX - 6;
             
-            int maxY = this.height - bottom;
+            int maxY = this.height - BOTTOM;
             RenderSystem.disableTexture();
             Tesselator tesselator = Tesselator.getInstance();
             BufferBuilder buffer = tesselator.getBuilder();
@@ -154,17 +154,17 @@ public class ConfigScreenImpl extends Screen implements ConfigScreen {
             
             buffer.vertex(scrollbarPositionMinX, maxY, 0.0D).color(0, 0, 0, 255).endVertex();
             buffer.vertex(scrollbarPositionMaxX, maxY, 0.0D).color(0, 0, 0, 255).endVertex();
-            buffer.vertex(scrollbarPositionMaxX, top, 0.0D).color(0, 0, 0, 255).endVertex();
-            buffer.vertex(scrollbarPositionMinX, top, 0.0D).color(0, 0, 0, 255).endVertex();
+            buffer.vertex(scrollbarPositionMaxX, TOP, 0.0D).color(0, 0, 0, 255).endVertex();
+            buffer.vertex(scrollbarPositionMinX, TOP, 0.0D).color(0, 0, 0, 255).endVertex();
             
-            buffer.vertex(scrollbarPositionMinX, minY + height, 0.0D).color(BOTTOM_C, BOTTOM_C, BOTTOM_C, 1).endVertex();
-            buffer.vertex(scrollbarPositionMaxX, minY + height, 0.0D).color(BOTTOM_C, BOTTOM_C, BOTTOM_C, 1).endVertex();
-            buffer.vertex(scrollbarPositionMaxX, minY, 0.0D).color(BOTTOM_C, BOTTOM_C, BOTTOM_C, 1).endVertex();
-            buffer.vertex(scrollbarPositionMinX, minY, 0.0D).color(BOTTOM_C, BOTTOM_C, BOTTOM_C, 1).endVertex();
-            buffer.vertex(scrollbarPositionMinX, (minY + height - 1), 0.0D).color(TOP_C, TOP_C, TOP_C, 1).endVertex();
-            buffer.vertex((scrollbarPositionMaxX - 1), (minY + height - 1), 0.0D).color(TOP_C, TOP_C, TOP_C, 1).endVertex();
-            buffer.vertex((scrollbarPositionMaxX - 1), minY, 0.0D).color(TOP_C, TOP_C, TOP_C, 1).endVertex();
-            buffer.vertex(scrollbarPositionMinX, minY, 0.0D).color(TOP_C, TOP_C, TOP_C, 1).endVertex();
+            buffer.vertex(scrollbarPositionMinX, minY + height, 0.0D).color(SCROLLBAR_BOTTOM_COLOR, SCROLLBAR_BOTTOM_COLOR, SCROLLBAR_BOTTOM_COLOR, 1).endVertex();
+            buffer.vertex(scrollbarPositionMaxX, minY + height, 0.0D).color(SCROLLBAR_BOTTOM_COLOR, SCROLLBAR_BOTTOM_COLOR, SCROLLBAR_BOTTOM_COLOR, 1).endVertex();
+            buffer.vertex(scrollbarPositionMaxX, minY, 0.0D).color(SCROLLBAR_BOTTOM_COLOR, SCROLLBAR_BOTTOM_COLOR, SCROLLBAR_BOTTOM_COLOR, 1).endVertex();
+            buffer.vertex(scrollbarPositionMinX, minY, 0.0D).color(SCROLLBAR_BOTTOM_COLOR, SCROLLBAR_BOTTOM_COLOR, SCROLLBAR_BOTTOM_COLOR, 1).endVertex();
+            buffer.vertex(scrollbarPositionMinX, (minY + height - 1), 0.0D).color(SCROLLBAR_TOP_COLOR, SCROLLBAR_TOP_COLOR, SCROLLBAR_TOP_COLOR, 1).endVertex();
+            buffer.vertex((scrollbarPositionMaxX - 1), (minY + height - 1), 0.0D).color(SCROLLBAR_TOP_COLOR, SCROLLBAR_TOP_COLOR, SCROLLBAR_TOP_COLOR, 1).endVertex();
+            buffer.vertex((scrollbarPositionMaxX - 1), minY, 0.0D).color(SCROLLBAR_TOP_COLOR, SCROLLBAR_TOP_COLOR, SCROLLBAR_TOP_COLOR, 1).endVertex();
+            buffer.vertex(scrollbarPositionMinX, minY, 0.0D).color(SCROLLBAR_TOP_COLOR, SCROLLBAR_TOP_COLOR, SCROLLBAR_TOP_COLOR, 1).endVertex();
             tesselator.end();
             RenderSystem.disableBlend();
             RenderSystem.enableTexture();
@@ -181,14 +181,14 @@ public class ConfigScreenImpl extends Screen implements ConfigScreen {
         RenderSystem.shadeModel(7425);
         Matrix4f matrix = matrices.last().pose();
         buffer.begin(7, DefaultVertexFormat.POSITION_TEX_COLOR);
-        buffer.vertex(matrix, 0, top + 4, 0.0F).uv(0, 1).color(0, 0, 0, 0).endVertex();
-        buffer.vertex(matrix, width, top + 4, 0.0F).uv(1, 1).color(0, 0, 0, 0).endVertex();
-        buffer.vertex(matrix, width, top, 0.0F).uv(1, 0).color(0, 0, 0, 185).endVertex();
-        buffer.vertex(matrix, 0, top, 0.0F).uv(0, 0).color(0, 0, 0, 185).endVertex();
-        buffer.vertex(matrix, 0, height - bottom, 0.0F).uv(0, 1).color(0, 0, 0, 185).endVertex();
-        buffer.vertex(matrix, width, height - bottom, 0.0F).uv(1, 1).color(0, 0, 0, 185).endVertex();
-        buffer.vertex(matrix, width, height - bottom - 4, 0.0F).uv(1, 0).color(0, 0, 0, 0).endVertex();
-        buffer.vertex(matrix, 0, height - bottom - 4, 0.0F).uv(0, 0).color(0, 0, 0, 0).endVertex();
+        buffer.vertex(matrix, 0, TOP + 4, 0.0F).uv(0, 1).color(0, 0, 0, 0).endVertex();
+        buffer.vertex(matrix, width, TOP + 4, 0.0F).uv(1, 1).color(0, 0, 0, 0).endVertex();
+        buffer.vertex(matrix, width, TOP, 0.0F).uv(1, 0).color(0, 0, 0, 185).endVertex();
+        buffer.vertex(matrix, 0, TOP, 0.0F).uv(0, 0).color(0, 0, 0, 185).endVertex();
+        buffer.vertex(matrix, 0, height - BOTTOM, 0.0F).uv(0, 1).color(0, 0, 0, 185).endVertex();
+        buffer.vertex(matrix, width, height - BOTTOM, 0.0F).uv(1, 1).color(0, 0, 0, 185).endVertex();
+        buffer.vertex(matrix, width, height - BOTTOM - 4, 0.0F).uv(1, 0).color(0, 0, 0, 0).endVertex();
+        buffer.vertex(matrix, 0, height - BOTTOM - 4, 0.0F).uv(0, 0).color(0, 0, 0, 0).endVertex();
         tesselator.end();
         RenderSystem.enableTexture();
         RenderSystem.disableBlend();
@@ -214,7 +214,7 @@ public class ConfigScreenImpl extends Screen implements ConfigScreen {
     
     public int scrollHeight() {
         int totalHeight = totalHeight();
-        int listHeight = height - bottom - top;
+        int listHeight = height - BOTTOM - TOP;
         if (totalHeight <= listHeight) {
             return 0;
         }
@@ -269,7 +269,7 @@ public class ConfigScreenImpl extends Screen implements ConfigScreen {
     
     @Override
     public boolean mouseScrolled(double d, double e, double f) {
-        if (e >= top && e <= height - bottom) {
+        if (e >= TOP && e <= height - BOTTOM) {
             scrollerAmount = Mth.clamp(scrollerAmount - f * 16.0D, 0, scrollHeight());
             return true;
         }
@@ -290,13 +290,13 @@ public class ConfigScreenImpl extends Screen implements ConfigScreen {
         if (i != 0 || !this.dragging) {
             return false;
         }
-        if (e < top) {
+        if (e < TOP) {
             scrollerAmount = 0;
-        } else if (e > height - bottom) {
+        } else if (e > height - BOTTOM) {
             scrollerAmount = scrollHeight();
         } else {
             double h = Math.max(1, this.scrollHeight());
-            int j = height - bottom - top;
+            int j = height - BOTTOM - TOP;
             int k = Mth.clamp((int) ((float) (j * j) / (float) this.scrollHeight()), 32, j - 8);
             double l = Math.max(1.0, h / (double) (j - k));
             scrollerAmount = Mth.clamp(scrollerAmount + g * l, 0, scrollHeight());
