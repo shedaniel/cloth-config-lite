@@ -15,8 +15,8 @@ public class ClothEditBox extends EditBox {
     @Override
     public void setFocus(boolean bl) {
         for (GuiEventListener child : Minecraft.getInstance().screen.children()) {
-            if (child instanceof TextFieldOption) {
-                ClothEditBox box = ((TextFieldOption<?>) child).widget;
+            if (child instanceof TextFieldOption<?> option) {
+                ClothEditBox box = option.widget;
                 box.setFocused(box == this);
             }
         }

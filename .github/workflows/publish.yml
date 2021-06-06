@@ -10,6 +10,7 @@ on:
       - '**/src/**'
     branches:
       - "1.16"
+      - "1.17"
 
 jobs:
   build:

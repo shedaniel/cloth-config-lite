@@ -19,7 +19,7 @@ plugins {
     id 'maven-publish'
 }
 
-sourceCompatibility = targetCompatibility = 1.8
+sourceCompatibility = targetCompatibility = 16
 
 group = "me.shedaniel.cloth"
 archivesBaseName = "cloth-config-lite"
