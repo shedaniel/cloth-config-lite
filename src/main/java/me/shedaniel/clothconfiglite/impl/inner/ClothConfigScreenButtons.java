@@ -3,6 +3,8 @@ package me.shedaniel.clothconfiglite.impl.inner;
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.shedaniel.clothconfiglite.impl.ConfigScreenImpl;
 import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.narration.NarratedElementType;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 
@@ -35,5 +37,10 @@ public class ClothConfigScreenButtons extends AbstractButton {
         } else {
             screen.save();
         }
+    }
+    
+    @Override
+    public void updateNarration(NarrationElementOutput narrationElementOutput) {
+        narrationElementOutput.add(NarratedElementType.USAGE, getMessage());
     }
 }

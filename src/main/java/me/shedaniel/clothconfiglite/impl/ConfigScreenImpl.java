@@ -1,10 +1,7 @@
 package me.shedaniel.clothconfiglite.impl;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
 import me.shedaniel.clothconfiglite.api.ConfigScreen;
 import me.shedaniel.clothconfiglite.impl.inner.ClothConfigScreenButtons;
@@ -14,6 +11,7 @@ import me.shedaniel.clothconfiglite.impl.option.ToggleOption;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -104,11 +102,11 @@ public class ConfigScreenImpl extends Screen implements ConfigScreen {
     @Override
     protected void init() {
         super.init();
-        children.addAll(options);
+        ((List) children()).addAll(options);
         
         int buttonWidths = Math.min(200, (width - 50 - 12) / 3);
-        addButton(new ClothConfigScreenButtons(this, width / 2 - buttonWidths - 3, height - 22, buttonWidths, 20, TextComponent.EMPTY, true));
-        addButton(new ClothConfigScreenButtons(this, width / 2 + 3, height - 22, buttonWidths, 20, TextComponent.EMPTY, false));
+        addRenderableWidget(new ClothConfigScreenButtons(this, width / 2 - buttonWidths - 3, height - 22, buttonWidths, 20, TextComponent.EMPTY, true));
+        addRenderableWidget(new ClothConfigScreenButtons(this, width / 2 + 3, height - 22, buttonWidths, 20, TextComponent.EMPTY, false));
     }
     
     @Override
@@ -150,7 +148,8 @@ public class ConfigScreenImpl extends Screen implements ConfigScreen {
             RenderSystem.disableTexture();
             Tesselator tesselator = Tesselator.getInstance();
             BufferBuilder buffer = tesselator.getBuilder();
-            buffer.begin(7, DefaultVertexFormat.POSITION_COLOR);
+            RenderSystem.setShader(GameRenderer::getPositionColorShader);
+            buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
             
             buffer.vertex(scrollbarPositionMinX, maxY, 0.0D).color(0, 0, 0, 255).endVertex();
             buffer.vertex(scrollbarPositionMaxX, maxY, 0.0D).color(0, 0, 0, 255).endVertex();
@@ -177,10 +176,9 @@ public class ConfigScreenImpl extends Screen implements ConfigScreen {
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(770, 771, 0, 1);
         RenderSystem.disableTexture();
-        RenderSystem.disableAlphaTest();
-        RenderSystem.shadeModel(7425);
+        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
         Matrix4f matrix = matrices.last().pose();
-        buffer.begin(7, DefaultVertexFormat.POSITION_TEX_COLOR);
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
         buffer.vertex(matrix, 0, TOP + 4, 0.0F).uv(0, 1).color(0, 0, 0, 0).endVertex();
         buffer.vertex(matrix, width, TOP + 4, 0.0F).uv(1, 1).color(0, 0, 0, 0).endVertex();
         buffer.vertex(matrix, width, TOP, 0.0F).uv(1, 0).color(0, 0, 0, 185).endVertex();
@@ -192,7 +190,6 @@ public class ConfigScreenImpl extends Screen implements ConfigScreen {
         tesselator.end();
         RenderSystem.enableTexture();
         RenderSystem.disableBlend();
-        RenderSystem.enableAlphaTest();
     }
     
     protected void overlayBackground(PoseStack matrices, int h1, int h2, int color) {
@@ -202,9 +199,10 @@ public class ConfigScreenImpl extends Screen implements ConfigScreen {
     protected void overlayBackground(Matrix4f matrix, int minX, int minY, int maxX, int maxY, int red, int green, int blue, int startAlpha, int endAlpha) {
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder buffer = tesselator.getBuilder();
-        minecraft.getTextureManager().bind(GuiComponent.BACKGROUND_LOCATION);
-        RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-        buffer.begin(7, DefaultVertexFormat.POSITION_TEX_COLOR);
+        RenderSystem.setShaderTexture(0, GuiComponent.BACKGROUND_LOCATION);
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
         buffer.vertex(matrix, minX, maxY, 0.0F).uv(minX / 32.0F, maxY / 32.0F).color(red, green, blue, endAlpha).endVertex();
         buffer.vertex(matrix, maxX, maxY, 0.0F).uv(maxX / 32.0F, maxY / 32.0F).color(red, green, blue, endAlpha).endVertex();
         buffer.vertex(matrix, maxX, minY, 0.0F).uv(maxX / 32.0F, minY / 32.0F).color(red, green, blue, startAlpha).endVertex();

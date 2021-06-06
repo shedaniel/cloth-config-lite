@@ -15,7 +15,7 @@ buildscript {
 
 plugins {
     id 'java'
-    id 'forgified-fabric-loom' version "0.6-SNAPSHOT"
+    id 'dev.architectury.loom' version "0.8.0-SNAPSHOT"
     id 'maven-publish'
 }
 
