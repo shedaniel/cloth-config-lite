@@ -9,17 +9,17 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.guardsquare:proguard-gradle:7.1.0-beta5'
+        classpath 'com.guardsquare:proguard-gradle:7.2.1'
     }
 }
 
 plugins {
     id 'java'
-    id 'dev.architectury.loom' version "0.8.0-SNAPSHOT"
+    id 'dev.architectury.loom' version "0.10.0-SNAPSHOT"
     id 'maven-publish'
 }
 
-sourceCompatibility = targetCompatibility = 16
+sourceCompatibility = targetCompatibility = 17
 
 group = "me.shedaniel.cloth"
 archivesBaseName = "cloth-config-lite"
